@@ -1,0 +1,40 @@
+<?php
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FormController;
+use App\Http\Controllers\ProcessController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\SomeController;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+
+//公共路由无需认证
+Route::get('/', function (){return   'hello world';});
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::get('/captcha', [AuthController::class, 'generateCaptcha']);
+
+//需要认证的路由
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('forms', FormController::class);
+    Route::apiResource('processes', ProcessController::class);
+    Route::post('/processes/{process}/start', [ProcessController::class, 'startInstance']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+
+Route::group(['middleware' => ['auth:api']], function () {
+    Route::get('/protected-route', [SomeController::class, 'protectedMethod']);
+});
