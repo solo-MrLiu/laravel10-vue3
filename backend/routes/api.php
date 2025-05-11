@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\SomeController;
 
 //公共路由无需认证
 Route::get('/', function (){return   'hello world';});
+Route::post('/send-code', [AuthController::class, 'sendCode']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);

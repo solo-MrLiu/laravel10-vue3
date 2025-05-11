@@ -1,0 +1,196 @@
+@import "../base/variables";
+.login-form {
+  padding: $spacing-xl * 2 $spacing-lg;
+}
+
+.form-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: $spacing-xl;
+}
+
+.form-title {
+  color: $text-color;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: $spacing-md;
+}
+
+.social-login {
+  display: flex;
+  gap: $spacing-md;
+
+  .el-button {
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.remember-me {
+  text-align: right;
+  margin-bottom: $spacing-md;
+
+  .el-checkbox {
+    float: right;
+  }
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.login-btn {
+  height: 44px;
+  font-size: 16px;
+  background-color: $primary-color;
+  border-color: $primary-color;
+  transition: all 0.3s ease;
+  width: 100px;
+
+  &:hover {
+    background-color: $hover-color;
+    border-color: $hover-color;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+}
+/* 记住我和忘记密码在一行，两端对齐 */
+.remember-and-forgot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md ;
+}
+
+/* 登录和重置居中对齐 */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+/* 注册账号居中对齐 */
+.register-container {
+  text-align: right;
+  margin-top: $spacing-md;
+}
+.custom-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+.auth-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.auth-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--el-color-primary); /* 使用 Element Plus 主题色 */
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: #4f46e5;
+    text-decoration: underline;
+  }
+}
+
+.register {
+  order: 1;
+}
+
+.forgot-password {
+  order: 2;
+  text-align: right;
+}
+
+/* 图标间距 */
+.fa {
+  width: 14px;
+  text-align: center;
+}
+
+.mr-1 {
+  margin-right: 4px;
+}
+
+.el-form-item {
+  margin-bottom: $spacing-md;
+}
+
+.el-input__inner {
+  height: 40px;
+  border-radius: $border-radius-md;
+  border: 1px solid $border-color;
+  transition: all 0.3s ease;
+
+  &:focus {
+    border-color: $primary-color;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  }
+}
+
+.el-input__prefix {
+  color: $text-secondary;
+}
+
+.el-form-item__label {
+  font-weight: 500;
+  color: $text-secondary;
+}
+
+.get-code-btn {
+  height: 40px;
+  white-space: nowrap;
+  background-color: $primary-color;
+  border-color: $primary-color;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background-color: $hover-color;
+    border-color: $hover-color;
+  }
+
+  &:disabled {
+    background-color: #e6e6e6;
+    border-color: #e6e6e6;
+    color: #999;
+  }
+}
+
+.auth-dialog {
+  & .el-dialog__header {
+    padding: 20px 24px 10px;
+  }
+
+  & .el-dialog__body {
+    padding: 30px 24px;
+  }
+
+  & .el-dialog__footer {
+    padding: 20px 24px;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.el-form-item.is-error .el-input__inner {
+  animation: shake 0.5s ease-in-out;
+}

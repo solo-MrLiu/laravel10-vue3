@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Auth;
@@ -11,71 +12,142 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Mews\Captcha\Facades\Captcha;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
-    // 生成验证码（返回图片URL和缓存key）
-    public function generateCaptcha()
+
+    //发送短信验证码
+    public function sendCode(Request $request)
     {
-        $key = Str::random(32);
-        $captcha = Captcha::create('default', true);
-        Cache::put("captcha_{$key}", $captcha['text'], 300); // 5分钟有效期
+        $validator = Validator::make($request->all(), [
+            'phone' => ['required', 'regex:/^1[3-9]\d{9}$/', 'max:11'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $phone = $request->input('phone');
+        $code = rand(100000, 999999);
+
+        // 存入缓存（5分钟）
+        Cache::put("register_code_{$phone}", $code, now()->addMinutes(5));
+
+        // 模拟发送短信（可替换为真实服务）
+        Log::info("验证码发送给 {$phone}: {$code}");
+
         return response()->json([
-            'key' => $key,
-            'image' => $captcha['img']
+            'success' => true,
+            'message' => '验证码发送成功',
         ]);
     }
+
+    // 生成图片验证码（返回图片URL和缓存key）
+    public function generateCaptcha()
+    {
+        $key = Str::random(32); // 生成一个随机 key 用于缓存标识
+        // 生成验证码并获取图片内容
+        $builder = Captcha::create('default', true);
+
+        // 获取验证码文本（从 session 中）
+        $captchaText = session('default_captcha');
+
+        // 存入缓存
+        Cache::put("captcha_{$key}", $captchaText, now()->addMinutes(5));
+
+        return response()->json([
+            'key' => $key,
+            'image' => $builder['img']
+        ]);
+    }
+
 
     // 注册
     public function register(Request $request)
     {
-        $request->validate([
-            'username' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-//            'captcha_key' => 'required|string',
-//            'captcha_code' => 'required|string'
+        $validator = Validator::make($request->all(), [
+            'phone' => ['required', 'regex:/^1[3-9]\d{9}$/', 'unique:users,phone', 'max:11'],
+            'code' => ['required', 'numeric', 'digits:6'],
+            'password' => ['required', 'min:6', 'confirmed'],
         ]);
 
-//        // 验证验证码
-//        $cachedCode = Cache::get("captcha_{$request->captcha_key}");
-//        if (!$cachedCode || strtolower($request->captcha_code) !== strtolower($cachedCode)) {
-//            return response()->json(['message' => '验证码错误'], 422);
-//        }
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
 
+        $phone = $request->input('phone');
+        $code = $request->input('code');
+
+        // 校验验证码
+        $storedCode = Cache::get("register_code_{$phone}");
+        if (!$storedCode || $code != $storedCode) {
+            return response()->json([
+                'success' => false,
+                'message' => '验证码错误或已过期',
+            ], 400);
+        }
+
+        // 创建用户
         $user = User::create([
-            'name' => $request->username,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'phone' => $phone,
+            'password' => bcrypt($request->input('password')),
         ]);
 
-        return response()->json(['message' => '注册成功'], 200);
+        // 清除验证码
+        Cache::forget("register_code_{$phone}");
+
+        return response()->json([
+            'success' => true,
+            'message' => '注册成功',
+            'user' => $user
+        ]);
     }
 
     // 登录
     public function login(Request $request)
     {
-        $request->validate([
-            'username' => 'required',
-            'password' => 'required',
-//            'captcha_key' => 'required|string',
-//            'captcha_code' => 'required|string'
+        $validator = Validator::make($request->all(), [
+            'phone' => ['required', 'regex:/^1[3-9]\d{9}$/', 'max:11'],
+            'password' => ['required', 'min:6', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,20}$/'],
+            'captcha_key' => ['required', 'string', 'size:32'],
+            'captcha_code' => ['required', 'string', 'size:4'],
         ]);
+        $phone = $request->input('phone');
+        $password = $request->input('password');
+        $captchaKey = $request->input('captcha_key');
+        $captchaCode = $request->input('captcha_code');
 
-//        // 验证验证码
-//        $cachedCode = Cache::get("captcha_{$request->captcha_key}");
-//        if (!$cachedCode || strtolower($request->captcha_code) !== strtolower($cachedCode)) {
-//            return response()->json(['message' => '验证码错误'], 422);
-//        }
+        // 校验验证码
+        $cachedCode = Cache::get("captcha_{$captchaKey}");
+        dd($cachedCode);
 
-        $user = User::where('name', $request->username)->first();
-        if (! $user || ! Hash::check($request->password, $user->password)) {
-            return response()->json(['message' => '用户名或密码错误'], 401);
+        if (!$cachedCode || strtolower($captchaCode) !== strtolower($cachedCode)) {
+            return response()->json([
+                'success' => false,
+                'message' => '验证码错误',
+            ], 400);
+        }
+
+        $user = User::where('phone', $phone)->first();
+        if (!$user || !Hash::check($password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => '手机号或密码错误',
+            ], 401);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
-//            'user' => $user,
+            'success' => true,
+            'message' => '登录成功',
+            'user' => $user,
             'access_token' => $token,
             'token_type' => 'Bearer'
         ]);
