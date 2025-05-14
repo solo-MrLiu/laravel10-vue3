@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router';
 
 import Auth from '../views/auth/Auth.vue';
+import Home from '../views/home/Home.vue';
 
 const routes = [
 
@@ -8,6 +9,15 @@ const routes = [
         path: '/',
         name: 'login',
         component: Auth
+    },
+    {
+        path: '/home',
+        name: 'home',
+        component: Home,
+        meta: {
+            requiresAuth: true
+        }
+
     },
 
 
@@ -24,7 +34,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     if (to.meta.requiresAuth && !localStorage.getItem('access_token')) {
         alert('请先登录！');
-        next('/login');
+        next('/');
     } else {
         next();
     }

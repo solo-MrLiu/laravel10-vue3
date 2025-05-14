@@ -56,6 +56,7 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import axios from "axios";
 
 // Props
 const props = defineProps({
@@ -132,31 +133,65 @@ onUnmounted(() => {
 
 // 发送验证码
 const sendCode = () => {
-    formRef.value.validateField('phone', (error) => {
-        if (error) {
-            ElMessage.error(error)
+    formRef.value.validateField('phone', async (error) => {
+
+
+        if (!error) {
             return
         }
 
         sendingCode.value = true
-        setTimeout(() => {
-            sendingCode.value = false
-            countdown.value = 60
-            ElMessage.success('验证码已发送，请注意查收')
+        try {
+            const res = await axios.post('http://localhost:8000/api/send-code', {
+                phone: formData.value.phone
+            })
 
-            const timer = setInterval(() => {
-                countdown.value--
-                if (countdown.value <= 0) clearInterval(timer)
-            }, 1000)
-        }, 1000)
+            if (res.data.success) {
+                ElMessage.success('验证码已发送')
+                countdown.value = 60
+                const timer = setInterval(() => {
+                    countdown.value--
+                    if (countdown.value <= 0) clearInterval(timer)
+                }, 1000)
+            } else {
+                ElMessage.error(res.data.message || '验证码发送失败')
+            }
+        } catch (err) {
+            ElMessage.error('网络异常，请稍后再试')
+        } finally {
+            sendingCode.value = false
+        }
     })
 }
 
 // 提交处理
 const handleSubmit = () => {
-    formRef.value.validate((valid) => {
+    formRef.value.validate(async (valid) => {
         if (valid) {
-            emit('submit', formData.value)
+            try {
+                const response = await axios.post('http://localhost:8000/api/reset-password', {
+                    phone: formData.value.phone,
+                    code: formData.value.code,
+                    password: formData.value.password
+                })
+
+                if (response.data.success) {
+                    ElMessage.success('密码重置成功，请使用新密码登录')
+                    formRef.value.resetFields()
+                    emit('submit', formData.value)
+                    dialogVisible.value = false
+                } else {
+                    ElMessage.error(response.data.message || '密码重置失败')
+                }
+            } catch (error) {
+                if (error.response && error.response.status === 422) {
+                    ElMessage.error(error.response.data.message || '验证码错误或手机号未注册')
+                } else if (error.response && error.response.status === 400) {
+                    ElMessage.error(error.response.data.message || '无效或过期的重置链接')
+                } else {
+                    ElMessage.error('网络异常，请稍后再试')
+                }
+            }
         } else {
             ElMessage.error('表单验证失败，请检查输入')
             return false

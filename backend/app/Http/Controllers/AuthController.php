@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
@@ -35,7 +36,7 @@ class AuthController extends Controller
         $code = rand(100000, 999999);
 
         // 存入缓存（5分钟）
-        Cache::put("register_code_{$phone}", $code, now()->addMinutes(5));
+        Cache::put("code_{$phone}", $code, now()->addMinutes(5));
 
         // 模拟发送短信（可替换为真实服务）
         Log::info("验证码发送给 {$phone}: {$code}");
@@ -52,9 +53,8 @@ class AuthController extends Controller
         $key = Str::random(32); // 生成一个随机 key 用于缓存标识
         // 生成验证码并获取图片内容
         $builder = Captcha::create('default', true);
-
         // 获取验证码文本（从 session 中）
-        $captchaText = session('default_captcha');
+        $captchaText = $builder['key'];
 
         // 存入缓存
         Cache::put("captcha_{$key}", $captchaText, now()->addMinutes(5));
@@ -86,7 +86,7 @@ class AuthController extends Controller
         $code = $request->input('code');
 
         // 校验验证码
-        $storedCode = Cache::get("register_code_{$phone}");
+        $storedCode = Cache::get("code_{$phone}");
         if (!$storedCode || $code != $storedCode) {
             return response()->json([
                 'success' => false,
@@ -113,6 +113,7 @@ class AuthController extends Controller
     // 登录
     public function login(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'phone' => ['required', 'regex:/^1[3-9]\d{9}$/', 'max:11'],
             'password' => ['required', 'min:6', 'max:20', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,20}$/'],
@@ -126,9 +127,7 @@ class AuthController extends Controller
 
         // 校验验证码
         $cachedCode = Cache::get("captcha_{$captchaKey}");
-        dd($cachedCode);
-
-        if (!$cachedCode || strtolower($captchaCode) !== strtolower($cachedCode)) {
+        if (!$cachedCode ||  !Hash::check(strtolower($captchaCode),$cachedCode)) {
             return response()->json([
                 'success' => false,
                 'message' => '验证码错误',
@@ -143,6 +142,7 @@ class AuthController extends Controller
             ], 401);
         }
 
+
         $token = $user->createToken('auth_token')->plainTextToken;
         return response()->json([
             'success' => true,
@@ -153,64 +153,34 @@ class AuthController extends Controller
         ]);
     }
 
-    // 忘记密码（发送邮件）
-    public function forgotPassword(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'captcha_key' => 'required|string',
-            'captcha_code' => 'required|string'
-        ]);
-
-        // 验证验证码
-        $cachedCode = Cache::get("captcha_{$request->captcha_key}");
-        if (!$cachedCode || strtolower($request->captcha_code) !== strtolower($cachedCode)) {
-            return response()->json(['message' => '验证码错误'], 422);
-        }
-
-        $user = User::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json(['message' => '邮箱未注册'], 404);
-        }
-
-        $resetToken = Str::random(64);
-        Cache::put("password_reset_{$user->email}", $resetToken, 3600); // 1小时有效期
-
-        // 发送重置邮件（示例）
-        Mail::raw("重置密码链接：http://your-frontend.com/reset-password?email={$user->email}&token={$resetToken}", function ($message) use ($user) {
-            $message->to($user->email)->subject('重置密码');
-        });
-
-        return response()->json(['message' => '重置邮件已发送']);
-    }
-
     // 重置密码
     public function resetPassword(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'token' => 'required|string',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'captcha_key' => 'required|string',
-            'captcha_code' => 'required|string'
+        $phone = $request->input('phone');
+        $code = $request->input('code');
+        $password = $request->input('password');
+
+        // 校验验证码
+        $cachedCode = Cache::get("code_{$phone}");
+        if (!$cachedCode || $cachedCode != $code) {
+            return response()->json([
+                'success' => false,
+                'message' => '验证码错误或已过期',
+            ], 422);
+        }
+
+        // 更新用户密码
+        $user = \App\Models\User::where('phone', $phone)->first();
+        $user->password = bcrypt($password);
+        $user->save();
+
+        // 清除验证码缓存
+        Cache::forget("reset_code_{$phone}");
+
+        return response()->json([
+            'success' => true,
+            'message' => '密码重置成功',
         ]);
-
-        // 验证验证码
-        $cachedCode = Cache::get("captcha_{$request->captcha_key}");
-        if (!$cachedCode || strtolower($request->captcha_code) !== strtolower($cachedCode)) {
-            return response()->json(['message' => '验证码错误'], 422);
-        }
-
-        $storedToken = Cache::get("password_reset_{$request->email}");
-        if (!$storedToken || $storedToken !== $request->token) {
-            return response()->json(['message' => '无效或过期的重置链接'], 400);
-        }
-
-        $user = User::where('email', $request->email)->first();
-        $user->update(['password' => Hash::make($request->password)]);
-        Cache::forget("password_reset_{$request->email}");
-
-        return response()->json(['message' => '密码重置成功']);
     }
 
     // 退出登录

@@ -67,29 +67,11 @@ const showRegisterDialog = ref(false)
 const showForgotPasswordDialog = ref(false)
 const loginLoading = ref(false)
 
-// 页面加载时检查是否有记住的用户
-onMounted(() => {
-    const user = localStorage.getItem('auth_user')
-    if (user) {
-        const parsedUser = JSON.parse(user)
-        loginFormData.value.phone = parsedUser.phone
-        loginFormData.value.rememberMe = true
-    }
-})
+
 
 // 登录处理
 const handleLogin = (data) => {
-    console.log('登录表单数据：', data)
-    ElMessage.success('登录成功')
 
-    if (data.rememberMe) {
-        localStorage.setItem('auth_user', JSON.stringify({
-            phone: data.phone,
-            token: 'mock_token_' + Date.now()
-        }))
-    } else {
-        localStorage.removeItem('auth_user')
-    }
 }
 
 // 重置登录表单

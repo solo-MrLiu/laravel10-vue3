@@ -1,6 +1,6 @@
-import {createApp} from 'vue'
-import './assets/scss/main.scss'
-import App from './App.vue'
+import {createApp} from 'vue';
+import './assets/scss/main.scss';
+import App from './App.vue';
 import router from "./router";
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
@@ -16,7 +16,7 @@ axios.interceptors.response.use(
         // 检查错误对象是否包含响应，并且响应状态码是否为 401（未授权）
         if (error.response && error.response.status === 401) {
             // 如果是 401 错误，跳转到登录页面
-            router.push('/login');
+            router.push('/');
         }
 
         // 其他错误或非 401 错误，继续抛出以便在调用处处理
