@@ -2,6 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router';
 
 import Auth from '../views/auth/Auth.vue';
 import Home from '../views/home/Home.vue';
+import Admin from '../views/admin/Admin.vue';
 
 const routes = [
 
@@ -19,6 +20,35 @@ const routes = [
         }
 
     },
+    {
+        path: '/admin',
+        name: 'admin',
+        component: Admin,
+        meta: {
+            requiresAuth: true
+        },
+        children: [
+            {
+                path: '/admin/user',
+                name: 'User',
+                component: ()=>import('../components/admin/UserManagement.vue'),
+                meta: {
+                    requiresAuth: true,
+                    keepalive: false
+                }
+            },
+            {
+                path: '/admin/role',
+                name: 'Role',
+                component: ()=>import('../components/admin/UserManagement.vue'),
+                meta: {
+                    requiresAuth: true,
+                    keepalive: false
+                }
+            },
+        ]
+    },
+
 
 
 

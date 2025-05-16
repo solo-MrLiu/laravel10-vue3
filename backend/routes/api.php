@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\ProcessController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\SomeController;
@@ -31,9 +32,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('processes', ProcessController::class);
     Route::post('/processes/{process}/start', [ProcessController::class, 'startInstance']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/dashboards', function (){return 'dashboards';});
 });
 
-
+Route::prefix('users')->group(function () {
+    Route::get('', [UserController::class, 'index']);
+    Route::post('', [UserController::class,'store']);
+    Route::get('/{user}', [UserController::class,'show']);
+    Route::put('/{user}', [UserController::class, 'update']);
+    Route::delete('/{user}', [UserController::class, 'destroy']);
+});
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/protected-route', [SomeController::class, 'protectedMethod']);
 });

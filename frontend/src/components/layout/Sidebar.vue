@@ -1,10 +1,6 @@
 <template>
     <aside class="sidebar">
-        <ul>
-            <li><a href="#">首页</a></li>
-            <li><a href="#">用户管理</a></li>
-            <li><a href="#">设置</a></li>
-        </ul>
+        <router-view></router-view>
     </aside>
 </template>
 

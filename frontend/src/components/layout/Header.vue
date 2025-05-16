@@ -66,16 +66,16 @@ const storedData = getAuthData()
 const currentUser = ref(storedData ? storedData.user : {
     name: '游客',
     avatar: 'https://picsum.photos/id/1005/200/200',
-    role: 'user'
+    role: 'admin'
 })
 // 判断是否是管理员
-const isUserAdmin = computed(() => currentUser.role === 'admin')
+const isUserAdmin = computed(()=>true)//(() => currentUser.role === 'admin')//调试
 // 密码验证函数
 const handleAdminAccess = () => {
     const enteredPassword = prompt('请输入管理员密码：')
-    if (enteredPassword === 'yourSecurePassword') {
+    if (enteredPassword === '123789') {
         // 跳转到管理后台路由（需提前在 router 中定义）
-        router.push('/admin/dashboard')
+        router.push('/admin')
     } else {
         alert('密码错误！')
     }

@@ -12,7 +12,7 @@
 
 <style scoped>
 .main-content {
-    margin-left: 220px; /* 避开侧边栏 */
+    margin-left: 170px; /* 避开侧边栏 */
     padding: 10px;
 }
 </style>
