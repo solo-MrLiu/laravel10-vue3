@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClassificationController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\ProcessController;
 use App\Http\Controllers\UserController;
@@ -32,16 +33,34 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('processes', ProcessController::class);
     Route::post('/processes/{process}/start', [ProcessController::class, 'startInstance']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/dashboards', function (){return 'dashboards';});
+    Route::get('/dashboards', function () {
+        return 'dashboards';
+    });
 });
 
 Route::prefix('users')->group(function () {
     Route::get('', [UserController::class, 'index']);
-    Route::post('', [UserController::class,'store']);
-    Route::get('/{user}', [UserController::class,'show']);
+    Route::post('', [UserController::class, 'store']);
+    Route::get('/{user}', [UserController::class, 'show']);
     Route::put('/{user}', [UserController::class, 'update']);
     Route::delete('/{user}', [UserController::class, 'destroy']);
 });
+
 Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/protected-route', [SomeController::class, 'protectedMethod']);
+});
+
+//分类数据管理
+Route::prefix('classification')->group(function () {
+// 分类项
+    Route::get('/', [ClassificationController::class, 'index']);
+    Route::post('/store', [ClassificationController::class, 'store']);
+    Route::put('/project/{id}', [ClassificationController::class, 'update']);
+    Route::delete('/project/{id}', [ClassificationController::class, 'delete']);
+
+// 分类内容
+    Route::get('/content/{dataId}/{parentId?}', [ClassificationController::class, 'getClassificationData']);
+    Route::post('/content', [ClassificationController::class, 'addClassificationData']);
+    Route::put('/content/{id}', [ClassificationController::class, 'updateClassificationData']);
+    Route::delete('/content/{id}', [ClassificationController::class, 'deleteClassificationData']);
 });

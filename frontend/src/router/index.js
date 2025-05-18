@@ -31,7 +31,7 @@ const routes = [
             {
                 path: '/admin/user',
                 name: 'User',
-                component: ()=>import('../components/admin/UserManagement.vue'),
+                component: () => import('../components/admin/UserManage.vue'),
                 meta: {
                     requiresAuth: true,
                     keepalive: false
@@ -40,7 +40,16 @@ const routes = [
             {
                 path: '/admin/role',
                 name: 'Role',
-                component: ()=>import('../components/admin/UserManagement.vue'),
+                component: () => import('../components/admin/UserManagement.vue'),
+                meta: {
+                    requiresAuth: true,
+                    keepalive: false
+                }
+            },
+            {
+                path: '/admin/classification',
+                name: 'Classification',
+                component: () => import('../components/admin/ClassificationSelector.vue'),
                 meta: {
                     requiresAuth: true,
                     keepalive: false
@@ -48,9 +57,6 @@ const routes = [
             },
         ]
     },
-
-
-
 
 
 ];

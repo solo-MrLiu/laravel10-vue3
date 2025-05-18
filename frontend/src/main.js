@@ -5,6 +5,7 @@ import router from "./router";
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 import axios from 'axios';
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 // 设置 axios 的响应拦截器
 axios.interceptors.response.use(
@@ -28,4 +29,8 @@ axios.interceptors.response.use(
 const app = createApp(App);
 app.use(router);
 app.use(ElementPlus);
+// 注册所有图标
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, component)
+}
 app.mount('#app');

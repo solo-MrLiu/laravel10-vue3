@@ -73,13 +73,56 @@
                             title: '用户管理',
                             children: [
                                 {title: '部门用户', path: '/admin/user'},
-                                {title: '角色权限', path: '/admin/role'}
+                                {title: '角色权限', path: '/admin/role'},
                             ]
+                        },
+                        {
+                            title: '业务管理',
+                            children: [
+                                {title: '分类数据', path: '/admin/classification'},
+                                {title: '业务实体', path: '/admin/role'},
+                                {title: '审批流程', path: '/admin/role'},
+                                {title: '触发器', path: '/admin/role'},
+                            ]
+                        },
+                        {
+                            title: '商城管理',
+                            children: [
+                                {title: '商城装修', path: '/admin/user'},
+                                {title: '产品管理', path: '/admin/role'},
+                                {title: '价格管理', path: '/admin/role'},
+                                {title: '会员管理', path: '/admin/role'},
+                                {title: '充值管理', path: '/admin/role'},
+                                {title: '优惠券管理', path: '/admin/role'},
+                                {title: '促销管理', path: '/admin/role'},
+                            ]
+                        },                        {
+                            title: '产品追溯',
+                            children: [
+                                {title: '生产线管理', path: '/admin/user'},
+                                {title: '生成追溯码', path: '/admin/role'},
+                                {title: '入库扫码', path: '/admin/role'},
+                                {title: '出库扫码', path: '/admin/role'},
+                                {title: '反向追溯', path: '/admin/role'},
+                                {title: '异常预警', path: '/admin/role'},
+                            ]
+                        },
+                        {
+                            title: '报表管理',
+                            path: '/projects'
                         },
                         {
                             title: '项目管理',
                             path: '/projects'
-                        }
+                        },
+                        {
+                            title: '文件管理',
+                            path: '/projects'
+                        },
+                        {
+                            title: '日志管理',
+                            path: '/projects'
+                        },
                     ]
                 };
 
