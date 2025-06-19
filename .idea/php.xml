@@ -118,6 +118,7 @@
       <path value="$PROJECT_DIR$/backend/vendor/mews/captcha" />
       <path value="$PROJECT_DIR$/backend/vendor/intervention/image" />
       <path value="$PROJECT_DIR$/backend/vendor/intervention/gif" />
+      <path value="$PROJECT_DIR$/backend/vendor/overtrue/pinyin" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.1" />

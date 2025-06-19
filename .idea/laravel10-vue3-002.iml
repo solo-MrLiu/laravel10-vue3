@@ -125,6 +125,7 @@
       <excludeFolder url="file://$MODULE_DIR$/backend/vendor/intervention/gif" />
       <excludeFolder url="file://$MODULE_DIR$/backend/vendor/intervention/image" />
       <excludeFolder url="file://$MODULE_DIR$/backend/vendor/mews/captcha" />
+      <excludeFolder url="file://$MODULE_DIR$/backend/vendor/overtrue/pinyin" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

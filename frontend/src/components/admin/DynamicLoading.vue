@@ -80,7 +80,7 @@
                             title: '业务管理',
                             children: [
                                 {title: '分类数据', path: '/admin/classification'},
-                                {title: '业务实体', path: '/admin/role'},
+                                {title: '业务实体', path: '/admin/entity'},
                                 {title: '审批流程', path: '/admin/role'},
                                 {title: '触发器', path: '/admin/role'},
                             ]

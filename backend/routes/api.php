@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClassificationController;
+use App\Http\Controllers\EntityController;
 use App\Http\Controllers\FormController;
 use App\Http\Controllers\ProcessController;
 use App\Http\Controllers\UserController;
@@ -63,4 +64,20 @@ Route::prefix('classification')->group(function () {
     Route::post('/content', [ClassificationController::class, 'addClassificationData']);
     Route::put('/content/{id}', [ClassificationController::class, 'updateClassificationData']);
     Route::delete('/content/{id}', [ClassificationController::class, 'deleteClassificationData']);
+});
+
+//业务实体管理
+Route::prefix('entity')->group(function () {
+    Route::get('/', [EntityController::class, 'index'])->name('index');       // 获取所有实体
+    Route::post('/', [EntityController::class, 'store'])->name('store');     // 创建新实体
+    Route::get('/{id}', [EntityController::class, 'show'])->name('show');    // 获取指定实体
+    Route::put('/{id}', [EntityController::class, 'update'])->name('update');// 更新指定实体
+    Route::delete('/{id}', [EntityController::class, 'destroy'])->name('destroy'); // 删除指定实体
+    //字段管理
+    Route::get('/{id}/fields', [EntityController::class, 'getFields'])->name('getFields');
+    Route::post('/{id}/fields', [EntityController::class, 'addField'])->name('addField');
+    Route::put('/{id}/fields/{fieldId}', [EntityController::class, 'updateField'])->name('updateField');
+    Route::delete('/{id}/fields/{fieldId}', [EntityController::class, 'deleteField'])->name('deleteField');
+    Route::post('/{id}/fields/sort', [EntityController::class, 'sortFields'])->name('sortFields');
+    Route::post('/{id}/fields/move', [EntityController::class, 'moveField'])->name('moveField');
 });

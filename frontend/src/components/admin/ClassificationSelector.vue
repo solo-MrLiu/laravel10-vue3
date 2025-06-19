@@ -5,27 +5,35 @@
             <h3>
                 分类列表
                 <el-button circle size="small" type="primary" @click="openAddProjectDialog">
-                    <el-icon><Plus /></el-icon>
+                    <el-icon>
+                        <Plus/>
+                    </el-icon>
                 </el-button>
             </h3>
 
             <el-scrollbar max-height="600px">
                 <el-card
-                    v-for="(project, index) in projects"
-                    :key="index"
-                    class="project-card"
-                    :body-style="{ padding: '8px' }"
-                    :class="{ active: selectedProject?.id === project.id }"
-                    @click="selectProject(project)"
+                        v-for="(project, index) in projects"
+                        :key="index"
+                        class="project-card"
+                        :body-style="{ padding: '8px' }"
+                        :class="{ active: selectedProject?.id === project.id }"
+                        @click="selectProject(project)"
                 >
                     <div class="card-content">
                         <span>{{ project.name }}</span>
                         <div class="actions">
-                            <el-button link type="primary" size="small" @click.stop="openEditDialog('project', project)">
-                                <el-icon><Edit /></el-icon>
+                            <el-button link type="primary" size="small"
+                                       @click.stop="openEditDialog('project', project)">
+                                <el-icon>
+                                    <Edit/>
+                                </el-icon>
                             </el-button>
-                            <el-button link type="danger" size="small" @click.stop="confirmDelete('project', project, index)">
-                                <el-icon><Delete /></el-icon>
+                            <el-button link type="danger" size="small"
+                                       @click.stop="confirmDelete('project', project, index)">
+                                <el-icon>
+                                    <Delete/>
+                                </el-icon>
                             </el-button>
                         </div>
                     </div>
@@ -44,10 +52,10 @@
                         <div class="level-header">
                             <div class="level-title">{{ level }} 级分类</div>
                             <el-button
-                                type="primary"
-                                size="small"
-                                :disabled="!canAdd(level)"
-                                @click="openAddCategoryDialog(level)"
+                                    type="primary"
+                                    size="small"
+                                    :disabled="!canAdd(level)"
+                                    @click="openAddCategoryDialog(level)"
                             >
                                 添加
                             </el-button>
@@ -55,18 +63,24 @@
                         <el-scrollbar max-height="400px">
                             <table class="category-table">
                                 <tr
-                                    v-for="item in categories[level]"
-                                    :key="item.id"
-                                    :class="{ active: isSelected(item, level) }"
-                                    @click="handleSelectCategory(item, level)"
+                                        v-for="item in categories[level]"
+                                        :key="item.id"
+                                        :class="{ active: isSelected(item, level) }"
+                                        @click="handleSelectCategory(item, level)"
                                 >
                                     <td>{{ item.name }}</td>
                                     <td>
-                                        <el-button link type="primary" size="small" @click.stop="openEditCategoryDialog(item, level)">
-                                            <el-icon><Edit /></el-icon>
+                                        <el-button link type="primary" size="small"
+                                                   @click.stop="openEditCategoryDialog(item, level)">
+                                            <el-icon>
+                                                <Edit/>
+                                            </el-icon>
                                         </el-button>
-                                        <el-button link type="danger" size="small" @click.stop="confirmDelete(`level${level}`, item, level)">
-                                            <el-icon><Delete /></el-icon>
+                                        <el-button link type="danger" size="small"
+                                                   @click.stop="confirmDelete(`level${level}`, item, level)">
+                                            <el-icon>
+                                                <Delete/>
+                                            </el-icon>
                                         </el-button>
                                     </td>
                                 </tr>
@@ -81,7 +95,7 @@
         <el-dialog v-model="addProjectDialogVisible" title="添加分类" width="30%">
             <el-form @submit.prevent="handleSubmitProject">
                 <el-form-item label="分类名称">
-                    <el-input v-model="newProjectName" autofocus />
+                    <el-input v-model="newProjectName" autofocus/>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="handleSubmitProject">提交</el-button>
@@ -94,22 +108,49 @@
         <el-dialog v-model="editCategoryDialogVisible" :title="dialogTitle" width="40%">
             <el-form @submit.prevent="handleSubmitCategory">
                 <el-form-item label="分类名称">
-                    <el-input v-model="categoryForm.name" @input="updateFullName" />
+                    <el-input v-model="categoryForm.name" @input="updateFullName"/>
                 </el-form-item>
                 <el-form-item label="分类编码">
-                    <el-input v-model="categoryForm.code" />
+                    <el-input v-model="categoryForm.code"/>
                 </el-form-item>
-                <el-form-item label="全路径名称">
-                    <el-input v-model="categoryForm.fullName" readonly />
+                <el-form-item label="全称">
+                    <el-input v-model="categoryForm.fullName" readonly class="readonly-field">
+                        <template #suffix>
+                            <el-icon>
+                                <Lock/>
+                            </el-icon>
+                        </template>
+                    </el-input>
                 </el-form-item>
+
                 <el-form-item label="父级ID">
-                    <el-input v-model.number="categoryForm.parent_id" readonly />
+                    <el-input v-model.number="categoryForm.parent_id" readonly class="readonly-field">
+                        <template #suffix>
+                            <el-icon>
+                                <Lock/>
+                            </el-icon>
+                        </template>
+                    </el-input>
                 </el-form-item>
+
                 <el-form-item label="层级">
-                    <el-input v-model.number="categoryForm.level" readonly />
+                    <el-input v-model.number="categoryForm.level" readonly class="readonly-field">
+                        <template #suffix>
+                            <el-icon>
+                                <Lock/>
+                            </el-icon>
+                        </template>
+                    </el-input>
                 </el-form-item>
-                <el-form-item label="关联主分类ID">
-                    <el-input v-model.number="categoryForm.dataId" readonly />
+
+                <el-form-item label="分类项目ID">
+                    <el-input v-model.number="categoryForm.dataId" readonly class="readonly-field">
+                        <template #suffix>
+                            <el-icon>
+                                <Lock/>
+                            </el-icon>
+                        </template>
+                    </el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" native-type="submit">提交</el-button>
@@ -128,7 +169,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import {ref, computed, onMounted} from 'vue'
 import axios from 'axios'
 import {
     Edit,
@@ -248,7 +289,7 @@ function handleUpdateCategory(data) {
     }).then(() => {
         const idx = categories.value[data.level].findIndex(c => c.id === data.id)
         if (idx > -1) {
-            categories.value[data.level][idx] = { ...categories.value[data.level][idx], ...data }
+            categories.value[data.level][idx] = {...categories.value[data.level][idx], ...data}
         }
         editCategoryDialogVisible.value = false
     })
@@ -285,11 +326,12 @@ function openEditCategoryDialog(item, level) {
 
     categoryForm.value = {
         ...item,
-        fullName: generateFullName(level, parent),
+        // fullName: generateFullName(level, parent),
         parent_id: parent?.id || null,
         level: level,
         dataId: selectedProject.value.id
     }
+    categoryForm.value.fullName = generateFullName(level, parent)
 
     editingItem.value = item
     editingLevel.value = level
@@ -307,7 +349,6 @@ function handleSubmitCategory() {
 function updateFullName() {
     let path = []
     let currentLevel = categoryForm.value.level - 1
-
     while (currentLevel > 0) {
         const item = selectedLevels.value[currentLevel]
         if (item) path.unshift(item.name)
@@ -317,34 +358,34 @@ function updateFullName() {
     path.push(categoryForm.value.name)
 
     if (selectedProject.value?.name) {
-        categoryForm.value.fullName = `${selectedProject.value.name}/${path.join('/')}`
+        categoryForm.value.fullName = `${path.join('/')}`
     } else {
         categoryForm.value.fullName = ''
     }
 }
 
 function generateFullName(level, parent) {
-    if (level === 1) return selectedProject.value?.name || ''
-    if (!parent) return ''
 
-    let path = [parent.name]
+    if (level === 1) return categoryForm.value.name || ''
+
+    let path = []
     for (let i = level - 1; i > 0; i--) {
         const upperLevel = selectedLevels.value[i]
         if (upperLevel) path.unshift(upperLevel.name)
     }
-    return `${selectedProject.value?.name}/${path.join('/')}`
+    return `${path.join('/')}/${categoryForm.value.name || ''}`
 }
 
 // 删除逻辑
-const deleteTarget = ref({ type: null, item: null, level: null, index: null })
+const deleteTarget = ref({type: null, item: null, level: null, index: null})
 
 function confirmDelete(type, item, index = null) {
-    deleteTarget.value = { type, item, index }
+    deleteTarget.value = {type, item, index}
     deleteConfirmVisible.value = true
 }
 
 function handleDeleteConfirmed() {
-    const { type, item, index } = deleteTarget.value
+    const {type, item, index} = deleteTarget.value
     const itemId = item.id
 
     if (type === 'project') {
@@ -495,5 +536,19 @@ onMounted(() => {
 .category-table td {
     padding: 0 10px;
     border-bottom: 1px solid #eee;
+}
+
+:deep(.readonly-field .el-input__inner) {
+    background-color: #dcdfe6 !important;
+    cursor: not-allowed;
+}
+
+:deep(.readonly-field .el-input__suffix) {
+    display: flex;
+    align-items: center;
+}
+
+:deep(.readonly-field .el-input__suffix .el-icon) {
+    margin-right: 5px;
 }
 </style>

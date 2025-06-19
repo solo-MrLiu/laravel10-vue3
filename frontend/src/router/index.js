@@ -55,6 +55,25 @@ const routes = [
                     keepalive: false
                 }
             },
+            {
+                path: '/admin/entity',
+                name: 'Entity',
+                component: () => import('../components/admin/EntityList.vue'),
+                meta: {
+                    requiresAuth: true,
+                    keepalive: false
+                }
+            },
+
+            {
+                path: '/admin/entity/edit/:id',
+                name: 'EntityEdit',
+                component: () => import('../components/admin/EntityField.vue'),
+                meta: {
+                    requiresAuth: true,
+                    keepalive: false
+                }
+            },
         ]
     },
 
